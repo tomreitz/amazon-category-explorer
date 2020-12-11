@@ -24,7 +24,9 @@
 			.top h1 { display:inline-block; float:left; color:#FF9B00; font-size:28px; line-height:38px; max-height:38px; margin:0; padding:0; font-family:'Roboto',sans-serif; }
 			.top h1 .chunk { max-height:38px; vertical-align:top; overflow:hidden; display:inline-block; }
 			.top h1 .chunk.disappear { margin-right:8px; }
-			.top #category-path { display:inline-block; margin:0; margin-left:30px; padding:0; float:left; color:#FF9B00; line-height:40px; max-height:40px; font-size:16px; }
+			.top #category-path { display:inline-block; margin:0; margin-left:30px; padding:0; float:left; color:#FF9B00; line-height:40px; max-height:40px; font-size:16px;
+				max-width:-moz-calc(100% - 140px); max-width:-webkit-calc(100% - 140px); max-width:-o-calc(100% - 140px); max-width:calc(100% - 140px);
+				overflow:auto; overflow-x:auto; white-space:nowrap; }
 			.top #about { line-height:40px; max-height:40px; font-size:16px; float:right; padding:0; margin:0; margin-right:10px; vertical-align:top; }
 			.top #category-path a, .top #about a { text-decoration:none; color:#FFF; }
 			.left { margin-top:40px; height:90%; width:48%; display:inline-block; padding:1% 6% 0% 6%; }

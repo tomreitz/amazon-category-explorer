@@ -1,0 +1,75 @@
+<html>
+	<head>
+		<title>CS765 Design Challenge 3 - Tom Reitz - About</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+		<style type-="text/css">
+			html, body { margin:0; padding:0; font-family:sans-serif; }
+			body { text-align:center; }
+			a { color:#0275ff; }
+			.top { position:fixed; top:0; right:0; left:0; height:40px; padding:0 10px; background:#1C1919; z-index:100; }
+			.top h1 { display:inline-block; float:left; color:#FF9B00; font-size:28px; line-height:38px; max-height:38px; margin:0; padding:0; font-family:'Roboto',sans-serif; }
+			.top h1 .chunk { max-height:38px; vertical-align:top; overflow:hidden; display:inline-block; }
+			.top h1 .chunk.disappear { margin-right:8px; }
+			.top #about { line-height:40px; max-height:40px; font-size:16px; float:right; padding:0; margin:0; margin-right:10px; vertical-align:top; }
+			.top #category-path a, .top #about a { text-decoration:none; color:#FFF; }
+			#main { text-align:left; width:94%; max-width:900px; margin:40px auto 10px; padding:16px; }
+			.credit { font-size:80%; text-align:center; padding-bottom:15px; margin-top:5px; }
+			@media only screen and (max-width: 900px) {
+				.left { margin-top:40px; height:auto; width:96%; display:block; padding:2%; }
+				.right { position:relative; right:auto; top:auto; margin-top:0; width:98%; padding:10px; background:#EEE; border-left-width:0; display:block; float:none; clear:both; }
+				#settings { position:relative; bottom:0; clear:both; }
+			}
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				// Header animation
+				$('.top h1 .disappear').delay(4000).animate({width:'toggle'}, 500);
+				$('.top h1').on('mouseover', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
+				$('.top h1').on('mouseout', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
+			});
+		</script>
+		<div class="top"><h1><div class="chunk">a</div><div class="chunk disappear">mazon </div><div class="chunk">c</div><div class="chunk disappear">ategory </div><div class="chunk">e</div><div class="chunk disappear">xplorer</div></h1>
+			<div id="about"><a href="./index.html">App</a></div>
+		</div>
+		<div id="main">
+			<h1>ABOUT</h1>
+			<p>Amazon Category Explorer is an interactive visualization tool built by <a href="https://tomreitz.com/" target="_blank">Tom Reitz</a> as 
+				the <a href="https://graphics.cs.wisc.edu/Courses/765-f2020/pages/dc3/">final project for CS765 Visualization</a> at 
+				<a href="https://wisc.edu/" target="_blank">UW-Madison</a>'s <a href="https://www.cs.wisc.edu/" target="_blank">Computer Science</a> 
+				department in the Fall of 2020. The project was to create a visualization for Amazon's product category tree of over 27,000 categories.</p>
+			<h3>STORY</h3>
+			<p>The VP of Marketing at Amazon.com directs a large team of Analysts, Marketers, and Category/Product Managers who together keep the millions 
+				of items for sale on Amazon.com organized so shoppers can find what they need. She has commissioned a visualization tool to help this 
+				team navigate, understand, and manage the Amazon product category tree.</p>
+			<!-- YouTube vide embed goes here -->
+			<div style="position:relative; width:100%; height:0; padding-bottom:56.25%;">
+				<iframe src="https://www.youtube.com/embed/LD5jXRB3Il4" frameborder="0" style="position:absolute; top:0; left:0; width:100%; height:100%;"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+			<div style="text-align:center; font-size:12px; margin-top:5px;">
+				Video music from <a href="https://pixabay.com/music/">Pixabay</a>.
+				Amazon logo is copyright by <a href="https://www.aboutamazon.com/">Amazon.com</a>.
+			</div>
+			<h3>TASKS</h3>
+			<p>Specific requirements for the vis tool include:</p>
+			<ol>
+				<li>Ability to view and navigate the category tree, both at a high-level (presenting some overall structure of the tree) and in 
+					detail (specific categories deep inside the tree).</li>
+				<li>Ability to find all (sub)categories that match a search phrase.</li>
+				<li>Helps Amazon associates to find the best category(ies) for a product.</li>
+				<li>Facilitates understanding “relationships” between categories, e.g. sets of categories that share many products.</li>
+				<li>Facilitates finding categories that share many products (candidates for merging).</li>
+				<li>The tool must work well on both mobile and desktop devices.</li>
+			</ol>
+			<h3>APPROACH</h3>
+			<p></p>
+			<p class="credit">Built with <a href="https://jquery.com/">jQuery</a> and <a href="https://observablehq.com/@d3/radial-tidy-tree">D3 Radial Tidy Tree</a></p>
+		</div>
+	</body>
+</html>

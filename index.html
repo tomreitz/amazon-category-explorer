@@ -1,0 +1,390 @@
+<html>
+	<head>
+		<title>CS765 Design Challenge 3 - Tom Reitz</title>
+
+		<!-- Load JS libraries from CDNs: -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+
+		<!-- Load product category tree data: -->
+		<script src = "./tree.json"></script>
+
+		<!-- Styles for this app: -->
+		<style type-="text/css">
+			html, body { margin:0; padding:0; font-family:sans-serif; }
+			a { color:#0275ff; }
+			fieldset { margin-top:10px; border:1px solid #888; -moz-border-radius:8px; -webkit-border-radius:8px; border-radius:8px; margin-right:10px; }
+			legend.bold { font-weight:bold; }
+			legend.center { text-align:center; }
+			.top { position:fixed; top:0; right:0; left:0; height:40px; padding:0 10px; background:#1C1919; z-index:100; }
+			.top h1 { display:inline-block; float:left; color:#FF9B00; font-size:28px; line-height:38px; max-height:38px; margin:0; padding:0; font-family:'Roboto',sans-serif; }
+			.top h1 .chunk { max-height:38px; vertical-align:top; overflow:hidden; display:inline-block; }
+			.top h1 .chunk.disappear { margin-right:8px; }
+			.top #category-path { display:inline-block; margin:0; margin-left:30px; padding:0; float:left; color:#FF9B00; line-height:40px; max-height:40px; font-size:16px; }
+			.top #about { line-height:40px; max-height:40px; font-size:16px; float:right; padding:0; margin:0; margin-right:10px; vertical-align:top; }
+			.top #category-path a, .top #about a { text-decoration:none; color:#FFF; }
+			.left { margin-top:40px; height:90%; width:48%; display:inline-block; padding:1% 6% 0% 6%; }
+			.right { margin-top:40px; width:40%; height:96%; position:fixed; right:0; top:0; padding:10px; background:#EEE; border-left:2px solid #CCC; }
+			.right  h3 { margin-bottom:5px; }
+			#categoryDetails .alsos-bar { font-size:12px;border-radius:4px; background:#FF9B00; text-align:right; clear:both; display:inline-block; padding:2px 0; }
+			#categoryDetails .alsos-path { font-size:12px;border-top:1px solid #CCC; padding:3px 0; margin-top:3px; width:100%; clear:both; }
+			#chart svg text { cursor:pointer; font-size:15pt; }
+			#chart svg text:hover { fill:#0275ff; font-size:17pt; font-weight:bold; }
+			#current_filter { width:98%; font-size:12pt; height:28px; padding:4px; border:1px solid #CCC; border-radius:4px; }
+			#not-found { display:none; float:right; color:#C00; font-weight:bold; margin:-22px 20px 0 0; position:relative; z-index:100; }
+			svg.ui, svg.ticks { position:relative; top:-10px; z-index:-1; }
+			svg.ui text { font-size:8pt; }
+			#settings { position:absolute; bottom:10px; }
+			.credit { font-size:80%; text-align:center; padding-bottom:15px; margin-top:5px; }
+			.legend { position:absolute; left:10px; top:50px; width:120px; font-size:12px; line-height:20px; }
+			.legend svg { vertical-align:middle; }
+			/* Make the app responsive: */
+			@media only screen and (max-width: 900px) {
+				.left { margin-top:40px; height:auto; width:96%; display:block; padding:2%; }
+				.right { position:relative; right:auto; top:auto; margin-top:0; width:98%; padding:10px; background:#EEE; border-left-width:0; display:block; float:none; clear:both; }
+				#settings { position:relative; bottom:0; clear:both; }
+			}
+		</style>
+	</head>
+	<body>
+		<div class="legend">
+			<div style="font-size:14px; margin-bottom:4px; font-weight:bold;">Legend:</div>
+			<svg height="16" width="16"><circle cx="8" cy="8" r="5" stroke-width="0" fill="#FF9B00" /></svg> Subcategories<br />
+			<svg height="16" width="16"><circle cx="8" cy="8" r="5" stroke-width="0" fill="#555555" /></svg> No subcategories<br />
+			<svg height="16" width="16"><circle cx="8" cy="8" r="3" stroke-width="0" fill="#555555" /></svg> Few products<br />
+			<svg height="16" width="16"><circle cx="8" cy="8" r="8" stroke-width="0" fill="#555555" /></svg> Many products
+		</div>
+		<div class="top"><h1><div class="chunk">a</div><div class="chunk disappear">mazon </div><div class="chunk">c</div><div class="chunk disappear">ategory </div><div class="chunk">e</div><div class="chunk disappear">xplorer</div></h1>
+			<div id="about"><a href="./about.html">About</a></div>
+			<div id="category-path"><a href="#" class="cat-path" data-cat-id="0">Main</a></div>
+		</div>
+		<div id="chart" class="chart left"></div>
+		<div class="right">
+			<h3 style="margin-top:0;">Details</h3>
+			<div id="categoryDetails">
+				<p style="text-align:center;">Hover over a category for more info; click it to jump inside</p>
+			</div>
+			<div id="settings">
+				<h3>Settings</h3>
+				<input id="current_filter" type="text" placeholder="Limit to category-paths that match..." value="" />
+				<div id="not-found">no matches</div>
+				<fieldset class="range_field" style="margin-bottom:-5px;">
+				  <legend class="center">Max Tree Levels</legend>
+				   <input class="range" id="current_depth" type="range" min="1" max="4" value="2" style="width:100%" />
+				   <svg class="ticks" role="presentation" width="100%" height="12" xmlns="http://www.w3.org/2000/svg">
+				      <rect x="2%" y="3" width="1" height="12"></rect>
+				      <rect x="34%" y="3" width="1" height="12"></rect>
+				      <rect x="66%" y="3" width="1" height="12"></rect>
+				      <rect x="99%" y="3" width="1" height="12"></rect>
+				   </svg>
+				   <svg style="margin-bottom:-10px;" class="ui" role="presentation" width="100%" height="14" xmlns="http://www.w3.org/2000/svg">
+				      <text x="1.5%" y="14" text-anchor="start">1</text>
+				      <text x="34%" y="14" text-anchor="middle">2</text>
+				      <text x="66%" y="14" text-anchor="middle">3</text>
+				      <text x="99%" y="14" text-anchor="middle">4</text>
+				   </svg>
+				</fieldset>
+				<fieldset class="range_field">
+				  <legend class="center">Max Categories per Level</legend>
+				   <input class="range" id="current_max" type="range" min="5" max="40" value="10" style="width:100%" />
+				   <svg class="ticks" role="presentation" width="100%" height="12" xmlns="http://www.w3.org/2000/svg">
+				      <rect x="2%" y="3" width="1" height="12"></rect>
+				      <rect x="15.5%" y="3" width="1" height="12"></rect>
+				      <rect x="29.5%" y="3" width="1" height="12"></rect>
+				      <rect x="43.5%" y="3" width="1" height="12"></rect>
+				      <rect x="57%" y="3" width="1" height="12"></rect>
+				      <rect x="71%" y="3" width="1" height="12"></rect>
+				      <rect x="85%" y="3" width="1" height="12"></rect>
+				      <rect x="98.5%" y="3" width="1" height="12"></rect>
+				   </svg>
+				   <svg class="ui" role="presentation" width="100%" height="14" xmlns="http://www.w3.org/2000/svg">
+				      <text x="1.5%" y="14" text-anchor="start">5</text>
+				      <text x="15.5%" y="14" text-anchor="middle">10</text>
+				      <text x="29.5%" y="14" text-anchor="middle">15</text>
+				      <text x="43.5%" y="14" text-anchor="middle">20</text>
+				      <text x="57%" y="14" text-anchor="middle">25</text>
+				      <text x="71%" y="14" text-anchor="middle">30</text>
+				      <text x="85%" y="14" text-anchor="middle">35</text>
+				      <text x="98.5%" y="14" text-anchor="middle">40</text>
+				   </svg>
+				  <div style="text-align:center;">
+				    Prefer categories with <select id="current_order">
+				      <option value="product" selected="selected">more products</option>
+				      <option value="category">more subcategories</option>
+				    </select>
+				  </div>
+				</fieldset>
+				<input type="hidden" id="current_root_node_id" value="0" />
+				<p class="credit">Built with <a href="https://jquery.com/">jQuery</a> and <a href="https://observablehq.com/@d3/radial-tidy-tree">D3 Radial Tidy Tree</a></p>
+			</div>
+		</div>
+		<script type="module">
+			import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+
+			// Header animation:
+			$('.top h1 .disappear').delay(4000).animate({width:'toggle'}, 500);
+			$('.top h1').on('mouseover', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
+			$('.top h1').on('mouseout', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
+
+			// Initialize tree from URL hash (if any):
+			if(location.hash!='') $("#current_root_node_id").val(parseInt(location.hash.replace('#','')));
+			var current_tree = getSubtree(data, parseInt($("#current_root_node_id").val()), parseInt($("#current_depth").val()));
+			let max_fanout = getMaxFanout(current_tree);
+			updatePathBreadcrumbs(parseInt($("#current_root_node_id").val()));
+
+			// Settings UI elements event handlers:
+			$("#current_max").on("change", (e) => { e.preventDefault(); redrawTree(); });
+			$("#current_depth").on("change", (e) => { e.preventDefault(); redrawTree(); });
+			$("#current_order").on("change", (e) => { e.preventDefault(); redrawTree(); });
+			$("#current_filter").on("keyup", (e) => { e.preventDefault(); redrawTree(); });
+			$('#current_filter').focus();
+			$("#category-path, #categoryDetails").on("click", ".cat-path", function(e) {
+				e.preventDefault();
+				console.log($(this).attr("data-cat-id")); selectCategory($(this).attr("data-cat-id"));
+			});
+
+			// Helper function to extract/show category details:
+			function showCategoryDetails(d) {
+				let html = '<fieldset><legend class="bold">' + d.name + '</legend><ul>';
+				if(d.path.length>1) html += '<li>Parent category: <b>' + d.path[d.path.length-2] + '</b></li>';
+				if(d.num_children>0) html += '<li><b>' + d.num_children + '</b> subcategories in this category</li>';
+				html += '<li><b>' + d.product_count + '</b> products in this category</li>';
+				if(d.num_children>0) html += '<li><b>' + d.subtree_product_count + '</b> products in this category and its subcategories</li>';
+				html += '</ul>';
+				var alsos = JSON.parse(d.also_ids.replaceAll('(','[').replaceAll(')',']'));
+				if(alsos.length>0) {
+					html += 'Top other categories that share products with this category:<div>';
+					for(var i=0;i<Math.min(alsos.length,5);i++) {
+						var also_path = getPathToNode(data, parseInt(alsos[i][0]));
+						html += '<div class="alsos-path"><a href="#" class="cat-path" data-cat-id="0">Main</a>';
+						for(var j=also_path.length-1;j>=0;j--)
+							html += ' &raquo; <a href="#" class="cat-path" data-cat-id="'+also_path[j].id+'">'+also_path[j].name+'</a>';
+						html += '</div>';
+						html += '<div class="alsos-bar" style="width:'+(100*parseInt(alsos[i][1])/parseInt(alsos[0][1]))+'%">&nbsp;'+alsos[i][1]+'&nbsp;</div>';
+					}
+					html += '</div>';
+				}
+				html += '</fieldset>';
+				$('#categoryDetails').html(html);
+			}
+
+			// Helper function to clear out category details:
+			function clearCategoryDetails() {
+				$('#categoryDetails').html('<p style="text-align:center;">Hover over a category for more info; click it to jump inside</p>');
+			}
+
+			// Helper function which gets the max fanout for the tree:
+			function getMaxFanout(tree) {
+				var maxFanout = tree.children.length;
+				for(var i=0;i<tree.children.length;i++) {
+					var childFanout = getMaxFanout(tree.children[i]);
+					if(childFanout>maxFanout) maxFanout = childFanout;
+				}
+				return maxFanout;
+			}
+
+			// Helper function which filters the full tree down to just those category-paths that include the filter:
+			function filterTree(tree) {
+				let filteredTree = Object.assign({}, tree);
+				filteredTree.children = []; // trim off all branches
+				for(var i=0;i<tree.children.length;i++) { // add them back one-by-one
+					let subtree = filterTree(tree.children[i]);
+					if(subtree) filteredTree.children.push(subtree);
+					if(tree.children[i].name.includes($('#current_filter').val())) filteredTree.children.push();
+				}
+				if(filteredTree.children.length>0 || filteredTree.name.toLowerCase().includes($('#current_filter').val().toLowerCase())) return filteredTree;
+				else return false;
+			}
+
+			// Helper function which finds the subtrees of root with specified node_id with a depth-limit:
+			function getSubtree(root, node_id, depth) {
+				if(root.id == node_id) return trimTree(root, depth);
+				for(var i=0;i<root.children.length;i++) {
+					let subtree = getSubtree(root.children[i], node_id, depth)
+					if(subtree) return subtree;
+				}
+				return false;
+			}
+
+			// Helper function which returns an array of nodes in the path from root to node_id:
+			function getPathToNode(root, node_id) {
+				let path_nodes = [];
+				if(node_id==0) {
+					// root... do nothing.
+				} else if(root.id == node_id) {
+					let rootCopy = Object.assign({}, root);
+					rootCopy.children = [];
+					path_nodes.push(rootCopy);
+				} else if(root.children.length>0) {
+					for(var i=0;i<root.children.length;i++) {
+						let subpath_nodes = getPathToNode(root.children[i], node_id)
+						if(subpath_nodes.length>0) {
+							let childCopy = Object.assign({}, root.children[i]);
+							childCopy.children = [];
+							for(var j=0;j<subpath_nodes.length;j++) if(subpath_nodes[j].id!=childCopy.id) path_nodes.push(subpath_nodes[j]);
+							path_nodes.push(childCopy);
+							break;
+						}
+					}
+				}
+				return path_nodes;
+			}
+
+			// Helper function which trims off branches beyond depth:
+			function trimTree(root, depth) {
+				let trimmedTree = Object.assign({}, root);
+				trimmedTree.children = []; // trim off all branches
+				if(depth==0) return trimmedTree;
+				let ordered_children = root.children.sort((a, b) => {
+					if($('#current_order').val()=='product') return b.subtree_product_count - a.subtree_product_count;
+					else if($('#current_order').val()=='category') return b.num_children - a.num_children;
+				});
+				for(var i=0;i<Math.min(root.children.length,parseInt($('#current_max').val()));i++) { // add them back one-by-one
+					trimmedTree.children.push( trimTree(ordered_children[i], depth-1) )
+				}
+				return trimmedTree;
+			}
+
+			// Helper function which gets the max number of products in any category in a subtree (used to help size bubbles in the D3 drawing):
+			function getMaxProductInCategory(subtree) {
+				let max = 0;
+				for(let i=0;i<subtree.children.length;i++) if(subtree.children[i].subtree_product_count>max) max = subtree.children[i].subtree_product_count;
+				return max;
+			}
+
+			// Helper function which selects a category (updates the current category path and redraws the tree):
+			function selectCategory(node_id) {
+				$("#current_root_node_id").val(node_id);
+				updatePathBreadcrumbs(node_id);
+				// update hash
+				if(history.pushState) history.pushState(null, null, '#' + node_id);
+				else location.hash = '#' + node_id;
+				redrawTree();
+			}
+
+			// Helper function which updates path breadcrumbs in header:
+			function updatePathBreadcrumbs(node_id) {
+				var pathNodes = getPathToNode(data, node_id);
+				var pathHTML = '<a href="#" class="cat-path" data-cat-id="0">Main</a>';
+				for(var i=pathNodes.length-1;i>=0;i--) pathHTML += ' &raquo; <a href="#" class="cat-path" data-cat-id="'+pathNodes[i].id+'">'+pathNodes[i].name+'</a>';
+				$('#category-path').html(pathHTML);
+			}
+
+			// Helper function which detroys the old D3 drawing and makes a new one (this is for moving around in the tree)
+			function redrawTree() {
+				if($('#current_filter').val()=='') {
+					$('#not-found').stop().fadeOut(250);
+					current_tree = getSubtree(data, parseInt($("#current_root_node_id").val()), parseInt($("#current_depth").val()));
+				} else {
+					let filteredTree = filterTree(data);
+					if(!filteredTree) {
+						filteredTree = data;
+						$('#not-found').stop().fadeIn(250);
+					} else {
+						$('#not-found').stop().fadeOut(250);
+					}
+					current_tree = getSubtree(filteredTree, parseInt($("#current_root_node_id").val()), parseInt($("#current_depth").val()));
+				}
+				max_fanout = getMaxFanout(current_tree);
+				document.getElementById("chart").innerHTML = '';
+				runtime.dispose();
+				runtime = new Runtime();
+				runtime.module(define, name => {
+				  if (name === "chart") return Inspector.into(".chart")();
+				});
+			}
+
+
+			// Adapted from https://observablehq.com/@d3/radial-tidy-tree@200
+			function define(runtime, observer) {
+			  const main = runtime.module();
+			  main.variable(observer("chart")).define("chart", ["tree","data","d3","autoBox"], function(tree,data,d3,autoBox) {
+				  const root = tree(data);
+				  const svg = d3.create("svg");
+				  svg.append("g")
+				      .attr("fill", "none")
+				      .attr("stroke", "#555")
+				      .attr("stroke-opacity", 0.4)
+				      .attr("stroke-width", 1.5)
+				    .selectAll("path")
+				    .data(root.links())
+				    .join("path")
+				      .attr("d", d3.linkRadial()
+				          .angle(d => d.x)
+				          .radius(d => d.y));
+  
+				  svg.append("g")
+				    .selectAll("circle")
+				    .data(root.descendants())
+				    .join("circle")
+				      .attr("transform", d => `
+				        rotate(${d.x * 180 / Math.PI - 90})
+				        translate(${d.y},0)
+				      `)
+				      .attr("fill", d => d.data.num_children>0 ? "#FF9B00" : "#555")
+				      .attr("r", d => (d.data.id==current_tree.id ? 5 : Math.max(5,(d.data.subtree_product_count / getMaxProductInCategory(current_tree))*40) ) ); // 2.5
+
+				  svg.append("g")
+				      .attr("font-family", "sans-serif")
+				      .attr("font-size", 20)
+				      .attr("stroke-linejoin", "round")
+				      .attr("stroke-width", 3)
+				    .selectAll("text")
+				    .data(root.descendants())
+				    .join("text")
+				      .attr("transform", d => `
+				        rotate(${d.x * 180 / Math.PI - 90})
+				        translate(${d.y},0)
+				        rotate(${d.x >= Math.PI ? 180 : 0})
+				        rotate(${max_fanout<=1 ? 90 : 0})
+                                      ` )
+				      .attr("dy", "0.31em")
+				      .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
+				      .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
+				      .text(d => (d.data.name.length>18 ? d.data.name.substr(0,15)+"..." : d.data.name) )
+				      .on('click', (e,d) => { if(d.data.num_children>0) { selectCategory(d.data.id); } } )
+				      .on('mouseover', (e,d) => { showCategoryDetails(d.data); } )
+				      //.on('mouseout', (e,d) => { clearCategoryDetails(d.data); } )
+				    .clone(true).lower()
+				      .attr("stroke", "white");
+
+				  return svg.attr("viewBox", autoBox).node();
+			  });
+			  main.variable(observer("autoBox")).define("autoBox", function(){return(
+				function autoBox() {
+				  document.body.appendChild(this);
+				  const {x, y, width, height} = this.getBBox();
+				  document.body.removeChild(this);
+				  return [x, y, width, height];
+				}
+			  )});
+			  main.variable(observer("data")).define("data", ["d3","FileAttachment"], function(d3){return(
+				d3.hierarchy(current_tree).sort((a, b) => d3.ascending(a.data.name, b.data.name))
+			  )});
+			  main.variable(observer("tree")).define("tree", ["d3","radius"], function(d3,radius){return(
+				d3.tree()
+				    .size([2 * Math.PI, radius])
+				    .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth)
+			  )});
+			  main.variable(observer("width")).define("width", function(){return(
+				954
+			  )});
+			  main.variable(observer("radius")).define("radius", ["width"], function(width){return(
+				width / 2
+			  )});
+			  main.variable(observer("d3")).define("d3", ["require"], function(require){return(
+				require("d3@6")
+			  )});
+			  return main;
+			}
+			//redrawTree();
+			let runtime = new Runtime();
+			runtime.module(define, name => {
+			  if (name === "chart") return Inspector.into(".chart")();
+			});
+		</script>
+	</body>
+</html>

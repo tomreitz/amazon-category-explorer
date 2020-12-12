@@ -129,11 +129,9 @@
 			import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
 
 			// Header animation:
-			if($(window).width()>=900) {
-				$('.top h1 .disappear').delay(4000).animate({width:'toggle'}, 500);
-				$('.top h1').on('mouseover', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
-				$('.top h1').on('mouseout', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
-			}
+			$('.top h1 .disappear').delay(4000).animate({width:'toggle'}, 500);
+			$('.top h1').on('mouseover', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
+			$('.top h1').on('mouseout', () => { $('.top h1 .disappear').stop().animate({width:'toggle'}, 500); });
 
 			// Initialize tree from URL hash (if any):
 			if(location.hash!='') $("#current_root_node_id").val(parseInt(location.hash.replace('#','')));

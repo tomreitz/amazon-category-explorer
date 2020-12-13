@@ -370,7 +370,7 @@
 				      .text(d => (d.data.name.length>18 ? d.data.name.substr(0,15)+"..." : d.data.name) )
 				      .on('click', (e,d) => {
                                         if(d.data.num_children>0) {
-                                          if($("window").width()>=900 || selected_category==d.data.id) selectCategory(d.data.id);
+                                          if($(window).width()>=900 || selected_category==d.data.id) selectCategory(d.data.id);
                                           else selected_category = d.data.id;
                                         }
                                       } )

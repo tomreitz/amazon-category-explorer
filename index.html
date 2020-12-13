@@ -348,7 +348,7 @@
 
 				  svg.append("g")
 				      .attr("font-family", "sans-serif")
-				      .attr("font-size", 20)
+				      .attr("font-size", ( $(window).width()>=900 ? 20 : 24) )
 				      .attr("stroke-linejoin", "round")
 				      .attr("stroke-width", 3)
 				    .selectAll("text")

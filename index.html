@@ -150,6 +150,7 @@
 			// Initialize tree from URL hash (if any):
 			if(location.hash!='') $("#current_root_node_id").val(parseInt(location.hash.replace('#','')));
 			var current_tree = getSubtree(data, parseInt($("#current_root_node_id").val()), parseInt($("#current_depth").val()));
+			var selected_category = parseInt($("#current_root_node_id").val());
 			let max_fanout = getMaxFanout(current_tree);
 			updatePathBreadcrumbs(parseInt($("#current_root_node_id").val()));
 
@@ -164,6 +165,12 @@
 				console.log($(this).attr("data-cat-id")); selectCategory($(this).attr("data-cat-id"));
 			});
 			$("#legend2-close").on("click", (e) => { e.preventDefault(); $(".legend2").hide(); });
+
+			window.USER_CAN_HOVER = false;
+			window.addEventListener('mouseover', function onFirstHover() {
+				window.USER_CAN_HOVER = true;
+				window.removeEventListener('mouseover', onFirstHover, false);
+			}, false);
 
 			// Helper function to extract/show category details:
 			function showCategoryDetails(d) {
@@ -364,7 +371,12 @@
 				      .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
 				      .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
 				      .text(d => (d.data.name.length>18 ? d.data.name.substr(0,15)+"..." : d.data.name) )
-				      .on('click', (e,d) => { if(d.data.num_children>0) { selectCategory(d.data.id); } } )
+				      .on('click', (e,d) => {
+                                        if(d.data.num_children>0) {
+                                          if(window.USER_CAN_HOVER || selected_category==d.data.id) selectCategory(d.data.id);
+                                          else selected_category = d.data.id;
+                                        }
+                                      } )
 				      .on('mouseover', (e,d) => { showCategoryDetails(d.data); } )
 				      //.on('mouseout', (e,d) => { clearCategoryDetails(d.data); } )
 				    .clone(true).lower()

@@ -45,6 +45,7 @@
 			.legend { position:absolute; left:10px; top:50px; width:120px; font-size:12px; line-height:20px; }
 			.legend svg { vertical-align:middle; }
 			.legend2 { display:none; }
+			.legend2-close { float:right; }
 			/* Make the app responsive: */
 			@media only screen and (max-width: 900px) {
 				.left { margin-top:40px; height:auto; width:96%; display:block; padding:2%; }
@@ -72,6 +73,7 @@
 		<div id="chart" class="chart left"></div>
 		<div class="right">
 			<div class="legend2">
+				<span id="legend2-close">&#10006;</span>
 				<h3 style="margin-top:0;">Legend</h3>
 				<svg height="20" width="20"><circle cx="10" cy="10" r="7" stroke-width="0" fill="#FF9B00" /></svg> Subcategories<br />
 				<svg height="20" width="20"><circle cx="10" cy="10" r="7" stroke-width="0" fill="#555555" /></svg> No subcategories<br />
@@ -160,6 +162,7 @@
 				e.preventDefault();
 				console.log($(this).attr("data-cat-id")); selectCategory($(this).attr("data-cat-id"));
 			});
+			$("#legend2-close").on("click", (e) => { e.preventDefault(); $(".legend2").hide(); });
 
 			// Helper function to extract/show category details:
 			function showCategoryDetails(d) {

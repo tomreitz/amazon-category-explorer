@@ -166,12 +166,6 @@
 			});
 			$("#legend2-close").on("click", (e) => { e.preventDefault(); $(".legend2").hide(); });
 
-			window.USER_CAN_HOVER = false;
-			window.addEventListener('mouseover', function onFirstHover() {
-				window.USER_CAN_HOVER = true;
-				window.removeEventListener('mouseover', onFirstHover, false);
-			}, false);
-
 			// Helper function to extract/show category details:
 			function showCategoryDetails(d) {
 				let html = '<fieldset><legend class="bold">' + d.name + '</legend><ul>';
@@ -373,7 +367,7 @@
 				      .text(d => (d.data.name.length>18 ? d.data.name.substr(0,15)+"..." : d.data.name) )
 				      .on('click', (e,d) => {
                                         if(d.data.num_children>0) {
-                                          if(window.USER_CAN_HOVER || selected_category==d.data.id) selectCategory(d.data.id);
+                                          if($("window").width()>=900 || selected_category==d.data.id) selectCategory(d.data.id);
                                           else selected_category = d.data.id;
                                         }
                                       } )

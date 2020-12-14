@@ -68,8 +68,13 @@
 				<li>Facilitates finding categories that share many products (candidates for merging).</li>
 				<li>The tool must work well on both mobile and desktop devices.</li>
 			</ol>
-			<h3>APPROACH</h3>
-			<p></p>
+			<h3>DETAILS</h3>
+			<p>ACE was implemented as an interactive web application using HTML, CSS, and Javascript. The radially-tidy tree is built with D3.js (which renders the tree in an SVG element). Interactions (hovering/clicking on nodes) are implemented with Javascript, specifically using the jQuery library.</p>
+			<p>Raw CSV data about Amazon product categories (given with the project specification) was preprocessed into a JSON structure via a Python script. The JSON data is then included into the web application directly. Subtrees are extracted from the JSON via various (mostly recursive) Javascript functions which process the tree data according to the parameters chosen by the app user.</p>
+			<p>CSS is used for layout and style of the app. The primary colors, orange and dark gray, were chosen to match the colors of Amazon.com’s branding. Links are blue, a familiar encoding in web browsers, indicating what’s clickable. Hovering over a node turns its text blue, which helps it stand out among many categories. Node color simply indicates whether a category has subcategories (orange) or not (gray).</p>
+			<p>Longer category names are truncated (indicated by ellipsis: “Security & Surv…”) to prevent the tree from becoming cluttered with long text, but the full category name (“Security & Surveillance”) can be seen in the Details section by hovering over it.</p>
+			<p>The size (radius) of each node encodes how many products are in its subtree, which makes approximate comparisons (“this category is about twice as big as that one”) fairly easy. Area is difficult for humans to judge, so this is not useful for precise comparisons. But the user can hover over two different categories and see the number of products in their subtrees (in the Details section) to compare exact quantities.</p>
+			<p>Some effort went into making the design mobile-friendly. On narrower screens, not only the major sections of the layout stack vertically, but other minor details improve usability. The app name is permanently abbreviated to “ace”, which leaves more space in the header. The breadcrumb path in the header is horizontally scrollable in order to make deep paths in the tree usable. The legend is moved from the upper-left corner (where it can obscure a portion of the tree on a narrow screen) to a separate section below, and can be closed/hidden entirely. The node font size is increased slightly on mobile devices. The "hover for details, click to jump in" behavior, which does not work on touch devices, is replaced by "click once for details, click again to jump in."</p>
 			<p class="credit">Built with <a href="https://jquery.com/">jQuery</a> and <a href="https://observablehq.com/@d3/radial-tidy-tree">D3 Radial Tidy Tree</a></p>
 		</div>
 	</body>
